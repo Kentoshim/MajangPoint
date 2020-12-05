@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dd6edc93da9b2a6d822d969070ad413796df5a4f6237148d494165f6d602cf12
+-- hash: 59bb907f54ae5bd3c2c4947a825a049e6a04b3f3f94c41ca8e4314aadebf358a
 
 name:           MajangPoint
 version:        0.1.0.0
@@ -29,7 +29,7 @@ library
   exposed-modules:
       Calculation
       Lib
-      Types.League
+      Types.Game
   other-modules:
       Paths_MajangPoint
   hs-source-dirs:

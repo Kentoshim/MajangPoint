@@ -1,4 +1,4 @@
-module League where
+module Types.Game where
 
 -- 対局
 data Game = Game GameName [User] 

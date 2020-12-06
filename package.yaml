@@ -24,6 +24,9 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+  - base >= 4.7 && < 5
+  - sort
 
 executables:
   MajangPoint-exe:

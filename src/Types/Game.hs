@@ -33,6 +33,7 @@ newtype UserID = UserID String
 
 -- 対局のルール、原点やウマ、オカなど
 data GameConfig = GameConfig Tally (Maybe RankBonus) (Maybe TopPrize)
+defaultGameConfig = GameConfig (Tally 30000) (Just (RankBonus 30 10)) Nothing
 
 -- 原点
 newtype Tally = Tally Int

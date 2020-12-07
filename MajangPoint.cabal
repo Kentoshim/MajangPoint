@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 59bb907f54ae5bd3c2c4947a825a049e6a04b3f3f94c41ca8e4314aadebf358a
+-- hash: 98fb4fc2deed3a5bcd31ec2f18ddb7543a673608fd588589dbbcb6e1f661cf2d
 
 name:           MajangPoint
 version:        0.1.0.0
@@ -50,10 +50,11 @@ executable MajangPoint-exe
     , base >=4.7 && <5
   default-language: Haskell2010
 
-test-suite MajangPoint-test
+test-suite MajangPoint-tasty
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: Tasty.hs
   other-modules:
+      Test
       Paths_MajangPoint
   hs-source-dirs:
       test
@@ -61,4 +62,6 @@ test-suite MajangPoint-test
   build-depends:
       MajangPoint
     , base >=4.7 && <5
+    , tasty
+    , tasty-hunit
   default-language: Haskell2010

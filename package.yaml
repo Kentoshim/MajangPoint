@@ -37,12 +37,14 @@ executables:
     - MajangPoint
 
 tests:
-  MajangPoint-test:
-    main:                Spec.hs
-    source-dirs:         test
+  MajangPoint-tasty:
+    main: Tasty.hs
+    source-dirs: test
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - MajangPoint
+    - tasty
+    - tasty-hunit

@@ -11,6 +11,7 @@ newtype GameName = GameName String
 
 -- 対局結果 (試合全体)
 data GameResult = GameResult UserPoints UserPoints UserPoints UserPoints
+  deriving (Show, Eq)
 
 -- TODO
 -- 点数計算のルールを適用して順位順でUserResultを並び替えてGameResultにする
@@ -55,10 +56,12 @@ toPoint (Tally t) (UserBones user (Bone bone)) =
 ent6 ::(RealFrac a, Integral b) => a -> b
 ent6 i
   | r < 6 = n
-  | otherwise = n + 1
+  | otherwise = if i > 0 
+      then n + 1
+      else n - 1
   where 
     (n, fl) = properFraction i
-    r = round . (* 10) $ fl
+    r = round . (* 10) $ abs fl
 
 
 newtype Point = Point Int

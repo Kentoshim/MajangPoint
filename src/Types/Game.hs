@@ -3,6 +3,8 @@
 module Types.Game where
 
 import Data.List
+import Control.Applicative
+
 -- 対局
 data Game = Game GameName [User] 
 
@@ -16,20 +18,24 @@ data GameResult = GameResult UserPoints UserPoints UserPoints UserPoints
 -- TODO
 -- 点数計算のルールを適用して順位順でUserResultを並び替えてGameResultにする
 gameResult :: GameConfig -> UserBones -> UserBones -> UserBones -> UserBones -> GameResult
-gameResult (GameConfig tally bonus) a b c d =
-  case bonus of
-    Nothing -> tmpResult
-    Just b -> applyBonus b tmpResult
+gameResult config@(GameConfig tally bonus first) a b c d =
+  applyBonus config tmpResult
   where
     points = sortBy (flip compare)  $ map (toPoint tally) [a,b,c,d]
     tmpResult = fromList points
     fromList :: [UserPoints] -> GameResult
     fromList [a,b,c,d] = GameResult a b c d
 
-applyBonus :: RankBonus -> GameResult -> GameResult
-applyBonus (RankBonus first second) (GameResult a b c d) =
-  GameResult (a `add` first) (b `add` second) (c `sub` second) (d `sub` first)
-  where 
+applyBonus :: GameConfig -> GameResult -> GameResult
+applyBonus (GameConfig t f mbonus) (GameResult a b c d) =
+  GameResult (a `add` first `add` topBonus) (b `add` second) (c `sub` second) (d `sub` first)
+  where
+    topBonus = Point . round . (/ 1000) . fromIntegral $ ((unTally t) - (unFirstPoint f)) * 4
+    bonus = case mbonus of
+      Nothing -> (Point 0, Point 0)
+      Just (RankBonus f s) -> (f, s)
+    first = fst bonus
+    second = snd bonus
     add :: UserPoints -> Point -> UserPoints
     add (UserPoints u p) bonus = UserPoints u (p + bonus)
     sub :: UserPoints -> Point -> UserPoints
@@ -84,12 +90,21 @@ newtype UserID = UserID String
   deriving (Show, Eq)
 
 -- 対局のルール、原点やウマ、オカなど
-defaultGameConfig = GameConfig (Tally 30000) (Just (RankBonus 30 10))
-data GameConfig = GameConfig Tally (Maybe RankBonus)
+defaultGameConfig = GameConfig (Tally 30000) (FirstPoint 25000) (Just (RankBonus 30 10))
+data GameConfig = GameConfig Tally FirstPoint (Maybe RankBonus)
 
+gameConfig :: Int -> Int -> Maybe (Int, Int) ->  GameConfig
+gameConfig t f bonus =
+  case bonus of
+    Nothing -> GameConfig (Tally t) (FirstPoint f) Nothing
+    Just (fs, sn) -> GameConfig (Tally t) (FirstPoint f) (Just (RankBonus (Point fs) (Point sn)))
+
+-- 初期の持ち点
+newtype FirstPoint = FirstPoint { unFirstPoint :: Int }
+  deriving (Show, Eq, Num)
 
 -- 原点
-newtype Tally = Tally Int
+newtype Tally = Tally  { unTally :: Int }
   deriving (Show, Eq, Num)
 
 -- ウマ

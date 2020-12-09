@@ -18,19 +18,20 @@ data GameResult = GameResult UserPoints UserPoints UserPoints UserPoints
 -- TODO
 -- 点数計算のルールを適用して順位順でUserResultを並び替えてGameResultにする
 gameResult :: GameConfig -> UserBones -> UserBones -> UserBones -> UserBones -> GameResult
-gameResult config@(GameConfig tally bonus first) a b c d =
+gameResult config a b c d =
   applyBonus config tmpResult
   where
-    points = sortBy (flip compare)  $ map (toPoint tally) [a,b,c,d]
+    points = map (toPoint config) $ sortBy (flip compare) [a,b,c,d]
     tmpResult = fromList points
     fromList :: [UserPoints] -> GameResult
     fromList [a,b,c,d] = GameResult a b c d
 
+-- ウマオカの計算をして勝点に反映する
 applyBonus :: GameConfig -> GameResult -> GameResult
 applyBonus (GameConfig t f mbonus) (GameResult a b c d) =
   GameResult (a `add` first `add` topBonus) (b `add` second) (c `sub` second) (d `sub` first)
   where
-    topBonus = Point . round . (/ 1000) . fromIntegral $ ((unTally t) - (unFirstPoint f)) * 4
+    topBonus = Point . round . (/ 1000) . fromIntegral $ (unTally t - unFirstPoint f) * 4
     bonus = case mbonus of
       Nothing -> (Point 0, Point 0)
       Just (RankBonus f s) -> (f, s)
@@ -42,10 +43,15 @@ applyBonus (GameConfig t f mbonus) (GameResult a b c d) =
     sub (UserPoints u p) bonus = UserPoints u (p - bonus)
 
 -- 対局結果(個人)
-data UserBones = UserBones User Bone
+data UserBones = UserBones { userInfo :: User, userBone :: Bone}
   deriving (Show, Eq)
 instance Ord UserBones where
-  compare (UserBones _ a) (UserBones _ b) = compare a b
+  compare (UserBones u1 a) (UserBones u2 b)
+    | compared == EQ = comparedWind
+    | otherwise = a `compare` b
+    where 
+      compared = a `compare` b
+      comparedWind = userWind u2 `compare` userWind u1
 
 data UserPoints = UserPoints User Point
   deriving (Show, Eq)
@@ -53,9 +59,9 @@ instance Ord UserPoints where
   compare (UserPoints _ a) (UserPoints _ b) = compare a b
 
 -- 得点から勝点へ
-toPoint :: Tally -> UserBones -> UserPoints
-toPoint (Tally t) (UserBones user (Bone bone)) =
-  let  p = ent6 . (/ 1000) . fromIntegral $ bone - t
+toPoint :: GameConfig -> UserBones -> UserPoints
+toPoint (GameConfig t _ _) (UserBones user (Bone bone)) =
+  let  p = ent6 . (/ 1000) . fromIntegral $ bone - unTally t
   in UserPoints user (Point p)
 
 -- 五捨六入する
@@ -78,21 +84,29 @@ newtype Bone = Bone Int
   deriving (Show, Eq, Ord, Num)
 
 -- ユーザー
-data User = User UserName UserID
+data User = User { userName :: UserName, userID :: UserID, userWind :: Wind }
   deriving (Show, Eq)
+
+instance Ord User where
+  compare (User _ _ wind) (User _ _ wind') = compare wind wind'
 
 -- ユーザー名
 newtype UserName = UserName String
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
 -- ユーザーID
 newtype UserID = UserID String
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
--- 対局のルール、原点やウマ、オカなど
+-- Wind
+data Wind = East | South | West | North
+  deriving (Show, Eq, Ord)
+
+-- 基本的なゲーム設定 25000点持ち30000点返し、オカ: 一位30、二位10
 defaultGameConfig = GameConfig (Tally 30000) (FirstPoint 25000) (Just (RankBonus 30 10))
 data GameConfig = GameConfig Tally FirstPoint (Maybe RankBonus)
 
+-- 対局のルール、原点やウマ、オカなど
 gameConfig :: Int -> Int -> Maybe (Int, Int) ->  GameConfig
 gameConfig t f bonus =
   case bonus of

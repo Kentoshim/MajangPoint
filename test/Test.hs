@@ -40,7 +40,7 @@ unit_calculate_gameResult_2 =
     ur3 = UserPoints west $ Point (-15)
     ur4 = UserPoints north $ Point (-35)
 
-unit_make_gameConfig :: IO ()
-unit_make_gameConfig =
-  gameConfig 30000 25000 (Just (30, 10)) @?= defaultGameConfig
+-- unit_make_gameConfig :: IO ()
+-- unit_make_gameConfig =
+--   gameConfig 30000 25000 (Just (30, 10)) @?= defaultGameConfig
 

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 98fb4fc2deed3a5bcd31ec2f18ddb7543a673608fd588589dbbcb6e1f661cf2d
+-- hash: d6ae0d8f188a13bd90fc4a11a1487dc6be3c67d086f53c9dafd55ca88f588167
 
 name:           MajangPoint
 version:        0.1.0.0
@@ -30,6 +30,8 @@ library
       Calculation
       Lib
       Types.Game
+      Types.Roles
+      Types.Tiles
   other-modules:
       Paths_MajangPoint
   hs-source-dirs:
@@ -55,6 +57,7 @@ test-suite MajangPoint-tasty
   type: exitcode-stdio-1.0
   main-is: Tasty.hs
   other-modules:
+      RoleTest
       Test
       Paths_MajangPoint
   hs-source-dirs:

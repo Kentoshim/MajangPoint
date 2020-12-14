@@ -44,6 +44,21 @@ data Number = One
             | Nine
   deriving (Show, Eq, Ord, Enum)
 
+fromInt :: Int -> Maybe Number
+fromInt i
+  | i < 1 || 9 < i = Nothing
+  | otherwise =
+      Just $ case i of
+        1 -> One
+        2 -> Two
+        3 -> Three
+        4 -> Four
+        5 -> Five
+        6 -> Six
+        7 -> Seven
+        8 -> Eight
+        9 -> Nine
+
 isSimple :: Number -> Bool
 isSimple One = False
 isSimple Nine = False

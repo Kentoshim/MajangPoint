@@ -24,9 +24,16 @@ dependencies:
 
 library:
   source-dirs: src
+  ghc-options:
+    - -w
   dependencies:
   - base >= 4.7 && < 5
   - sort
+  - attoparsec
+  - text
+  - bytestring
+  - mtl
+  - transformers
 
 executables:
   MajangPoint-exe:
@@ -36,6 +43,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -w
     dependencies:
     - MajangPoint
 

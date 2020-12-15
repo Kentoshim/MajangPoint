@@ -5,26 +5,30 @@ module Parser.HandParser where
 import qualified Data.Attoparsec.Text as PT
 import Data.Char
 import Data.Text
-import Data.ByteString
 import Control.Applicative
-import Control.Monad.Trans.Maybe
 
 import qualified Types.Tiles as Tile
 
+-- hand :: PT.Parser Tile.Hand
+-- hand = usualHand <|> thirteenOrphans <|> sevenPairs
+
+-- usualHand :: PT.Parser Tile.Hand
+-- usualHand =
+
 tile :: PT.Parser Tile.Tile
-tile = (Tile.Suit <$> suit) <|> (Tile.Dragon <$> dragon) -- <|> ( Tile.Wind <$> wind)
+tile = (Tile.Suit <$> suit) <|> (Tile.Dragon <$> dragon) <|> ( Tile.Wind <$> wind)
 
 dragon :: PT.Parser Tile.Dragon
 dragon = white <|> red <|> green
 
 white :: PT.Parser Tile.Dragon
-white = Tile.White <$ (charCI 'w' <|> PT.char '白')
-
-red :: PT.Parser Tile.Dragon
-red = Tile.Red <$ (charCI 'r' <|> PT.char '白')
+white = Tile.White <$ PT.char '白'
 
 green :: PT.Parser Tile.Dragon
-green = Tile.Green <$ (charCI 'g' <|> PT.char '發')
+green = Tile.Green <$ (charCI 'r' <|> PT.char '發')
+
+red :: PT.Parser Tile.Dragon
+red = Tile.Red <$ PT.char '中'
 
 wind ::PT.Parser Tile.Wind
 wind = east <|> south <|> west <|> north

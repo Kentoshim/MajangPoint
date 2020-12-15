@@ -1,12 +1,24 @@
 module Types.Tiles where
 
-class Tiles a where
+import Data.List
 
 -- 麻雀牌
 data Tile = Dragon Dragon
-          | Suit Suit
           | Wind Wind
-  deriving (Show, Eq, Ord)
+          | Suit Suit
+  deriving (Show, Eq)
+
+instance Ord Tile where
+  compare (Dragon _) (Wind _) = GT
+  compare (Dragon _) (Suit _) = GT
+  compare (Wind _) (Dragon _) = LT
+  compare (Wind _) (Suit _) = GT
+  compare (Suit _) (Dragon _) = LT
+  compare (Suit _) (Wind _) = LT
+  compare (Dragon l) (Dragon r) = compare l r
+  compare (Wind l) (Wind r) = compare l r
+  compare (Suit l) (Suit r) = compare l r
+
 
 isSimpleTile :: Tile -> Bool
 isSimpleTile (Suit s) = isSimple $ numOfSuit s
@@ -16,22 +28,50 @@ data Wind = West
           | South
           | East
           | North
-  deriving (Show, Eq, Ord, Enum)
-instance Tiles Wind where
+  deriving (Show, Eq, Enum)
+instance Ord Wind where
+  compare l r
+    | l == r = EQ
+    | otherwise = case (l, r) of
+        (West, _) -> GT
+        (South, West) -> LT
+        (South, East) -> GT
+        (South, North) -> GT
+        (East, South) -> LT
+        (East, West) -> LT
+        (East, North) -> GT
+        (North, North) -> EQ
+        (North, _) -> LT
 
 -- 三元牌
 data Dragon = White
             | Green
             | Red
-  deriving (Show, Eq, Ord, Enum)
-instance Tiles Dragon where
+  deriving (Show, Eq, Enum)
+instance Ord Dragon where
+  compare White Green = GT
+  compare White Red = GT
+  compare Green White = LT
+  compare Green Red = GT
+  compare Red White = LT
+  compare Red Green = LT
+  compare _ _ = EQ
 
 -- 数牌
 data Suit = Character Number
           | Circle Number
           | Banboo Number
-  deriving (Show, Eq, Ord)
-instance Tiles Suit where
+  deriving (Show, Eq)
+instance Ord Suit where
+  compare (Character _) (Circle _) = GT
+  compare (Character _) (Banboo _) = GT
+  compare (Circle _) (Character _) = LT
+  compare (Circle _) (Banboo _) = GT
+  compare (Banboo _) (Character _) = LT
+  compare (Banboo _) (Circle _) = LT
+  compare (Character l) (Character r) = compare l r
+  compare (Circle l) (Circle r) = compare l r
+  compare (Banboo l) (Banboo r) = compare l r
 
 data Number = One
             | Two

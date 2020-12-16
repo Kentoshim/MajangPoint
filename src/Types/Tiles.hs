@@ -19,7 +19,6 @@ instance Ord Tile where
   compare (Wind l) (Wind r) = compare l r
   compare (Suit l) (Suit r) = compare l r
 
-
 isSimpleTile :: Tile -> Bool
 isSimpleTile (Suit s) = isSimple $ numOfSuit s
 isSimpleTile _ = False 
@@ -73,6 +72,11 @@ instance Ord Suit where
   compare (Circle l) (Circle r) = compare l r
   compare (Banboo l) (Banboo r) = compare l r
 
+suitsNumber :: Suit -> Number
+suitsNumber (Character n) = n
+suitsNumber (Circle n) = n
+suitsNumber (Banboo n) = n
+
 data Number = One
             | Two
             | Three
@@ -116,31 +120,80 @@ data Hand
   | ThirteenOrphansHand Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile
   | None Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile
 
+hand :: [Tile] -> Either String Hand
+hand ts
+  | length ts /= 14 = Left "hand must consist of 14"
+  | otherwise = undefined
+
 elements :: Hand -> [Element]
 elements (UsualHand _ e1 e2 e3 e4) = [e1, e2, e3, e4]
 elements _ = []
 
 isSeq :: Element -> Bool
-isSeq (Seq _) = True
+isSeq SequenceElement {} = True
 isSeq _ = False
 
 isSimpleElement :: Element -> Bool
-isSimpleElement (Seq (a, b, c)) = all isSimpleTile [a,b,c]
-isSimpleElement (Triple t) = isSimpleTile t
+isSimpleElement el = all isSimpleTile $ tiles el
 
 -- 和了牌
 data WinninigTile
   = SelfDraw Tile
   | FromDiscard Tile
 
--- 対子
-newtype Pair = Pair Tile
-unPair :: Pair -> Tile
-unPair (Pair a) = a
-
--- 面子
-data Element 
-  = Seq (Tile, Tile, Tile)
-  | Triple Tile
-  | Quad Tile
+data Element
+  = PairElement Pair
+  | SequenceElement Seq
+  | TripleElement Triple
+  | QuadElement Quad
   deriving (Show, Eq)
+
+-- 対子
+newtype Pair = Pair { getPair :: Tile }
+  deriving (Show, Eq, Ord)
+-- 順子
+data Seq = Seq Tile Tile Tile
+  deriving (Show, Eq, Ord)
+-- 刻子
+newtype Triple = Triple { getTriple :: Tile }
+  deriving (Show, Eq, Ord)
+-- 槓子
+newtype Quad = Quad { getQuad :: Tile }
+  deriving (Show, Eq, Ord)
+
+-- ElementからTileを取り出す
+tiles :: Element -> [Tile]
+tiles (PairElement p) = [getPair p]
+tiles (TripleElement t) = [getTriple t]
+tiles (QuadElement q) = [getQuad q]
+tiles (SequenceElement (Seq a b c)) = [a, b, c]
+
+allSame :: Eq a => [a] -> Bool
+allSame [] = True
+allSame (x:xs) = all (==x) xs
+
+allSameSuit :: [Suit] -> Bool
+allSameSuit [] = True
+allSameSuit (s:ss) =
+  case s of
+    Character _ -> all isCharacter ss
+    Circle _ -> all isCircle ss
+    Banboo _ -> all isBanboo ss
+  where
+    isCharacter (Character _) = True
+    isCharacter _ = False
+    isCircle (Circle _) = True
+    isCircle _ = False
+    isBanboo (Banboo _) = True
+    isBanboo _ = False
+
+continuous :: (Enum a, Eq a) => a -> a -> Bool
+continuous a b = b == succ a
+
+isSequence :: Suit -> Suit -> Suit -> Bool
+isSequence a b c = allSameSuit [a, b, c] && na `continuous` nb && nb `continuous` nc
+  where 
+    na = suitsNumber a
+    nb = suitsNumber b
+    nc = suitsNumber c
+

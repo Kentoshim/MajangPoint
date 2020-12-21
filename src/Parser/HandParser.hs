@@ -23,6 +23,9 @@ element =
   (Tile.TripleElement <$> triple) <|>
   (Tile.PairElement <$> pair)
 
+tiles :: PT.Parser [Tile.Tile]
+tiles = PT.many1' tile
+
 pair :: PT.Parser Tile.Pair
 pair = do
   t1 <- tile

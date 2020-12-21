@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3e11eabea66d9aae009a607b29a4a3ab732ff312f15eed0718c6eee69a82d883
+-- hash: 974660e9e13f9d61ee0578d694cddce14154472bbf80a89ff05ebe187fb0203b
 
 name:           MajangPoint
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       Calculation
       Lib
       Parser.HandParser
+      Parser.TileParser
       Types.Game
       Types.Roles
       Types.Tiles
@@ -42,6 +43,7 @@ library
       attoparsec
     , base >=4.7 && <5
     , bytestring
+    , megaparsec
     , mtl
     , sort
     , text

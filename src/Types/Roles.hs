@@ -18,7 +18,7 @@ detectAllSequence h = if all isSeq $ elements h
 
 detectAllSimple :: Hand -> Maybe Role
 detectAllSimple h@(UsualHand p _ _ _ _) =
-  let pair = isSimpleTile $ unPair p
+  let pair = isSimpleTile $ getPair p
       element = all isSimpleElement $ elements h
   in  if pair && element
     then Just allSimple

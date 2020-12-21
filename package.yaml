@@ -34,6 +34,7 @@ library:
   - bytestring
   - mtl
   - transformers
+  - megaparsec
 
 executables:
   MajangPoint-exe:

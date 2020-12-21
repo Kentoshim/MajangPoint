@@ -19,9 +19,20 @@ instance Ord Tile where
   compare (Wind l) (Wind r) = compare l r
   compare (Suit l) (Suit r) = compare l r
 
+showTile :: Tile -> String
+showTile (Dragon d) = showDragon d
+showTile (Wind w) = showWind w
+showTile (Suit s) = showSuit s
+
 isSimpleTile :: Tile -> Bool
 isSimpleTile (Suit s) = isSimple $ numOfSuit s
-isSimpleTile _ = False 
+isSimpleTile _ = False
+
+isOrphanTile :: Tile -> Bool
+isOrphanTile (Suit s)
+  | isOrphan $ numOfSuit s = True
+  | otherwise = False
+isOrphanTile _ = True
 -- 風
 data Wind = West
           | South
@@ -42,6 +53,12 @@ instance Ord Wind where
         (North, North) -> EQ
         (North, _) -> LT
 
+showWind :: Wind -> String
+showWind West = "東"
+showWind South = "南"
+showWind East = "西"
+showWind North = "北"
+
 -- 三元牌
 data Dragon = White
             | Green
@@ -55,6 +72,11 @@ instance Ord Dragon where
   compare Red White = LT
   compare Red Green = LT
   compare _ _ = EQ
+
+showDragon :: Dragon -> String
+showDragon White = "白"
+showDragon Red = "中"
+showDragon Green = "發"
 
 -- 数牌
 data Suit = Character Number
@@ -72,6 +94,11 @@ instance Ord Suit where
   compare (Circle l) (Circle r) = compare l r
   compare (Banboo l) (Banboo r) = compare l r
 
+showSuit :: Suit -> String
+showSuit (Character n) = showNumber n ++ "萬"
+showSuit (Circle n) = showNumber n ++ "筒"
+showSuit (Banboo n) = showNumber n ++ "索"
+
 suitsNumber :: Suit -> Number
 suitsNumber (Character n) = n
 suitsNumber (Circle n) = n
@@ -87,6 +114,17 @@ data Number = One
             | Eight
             | Nine
   deriving (Show, Eq, Ord, Enum)
+
+showNumber :: Number -> String
+showNumber One = "一"
+showNumber Two = "二"
+showNumber Three = "三"
+showNumber Four = "四"
+showNumber Five = "五"
+showNumber Six = "六"
+showNumber Seven = "七"
+showNumber Eight = "八"
+showNumber Nine = "九"
 
 fromInt :: Int -> Maybe Number
 fromInt i
@@ -108,6 +146,11 @@ isSimple One = False
 isSimple Nine = False
 isSimple _ = True
 
+isOrphan :: Number -> Bool
+isOrphan One = True
+isOrphan Nine = True
+isOrphan _ = False
+
 numOfSuit :: Suit -> Number
 numOfSuit (Character a) = a
 numOfSuit (Circle a) = a
@@ -120,10 +163,13 @@ data Hand
   | ThirteenOrphansHand Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile
   | None Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile Tile
 
-hand :: [Tile] -> Either String Hand
-hand ts
-  | length ts /= 14 = Left "hand must consist of 14"
-  | otherwise = undefined
+-- hand :: [Tile] -> Either String Hand
+-- hand ts
+--   | length ts < 14 = Left "hand must consist of greater than 14 tiles"
+--   | length ts > 18 = Left "hand must consist of less than 18 tiles"
+--   | otherwise = sorted
+--     where
+--       sorted = sort ts
 
 elements :: Hand -> [Element]
 elements (UsualHand _ e1 e2 e3 e4) = [e1, e2, e3, e4]
